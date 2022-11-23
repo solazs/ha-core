@@ -18,6 +18,7 @@ from homeassistant.setup import async_setup_component
 from tests.common import MockConfigEntry
 
 ENTITY_ID_LIGHT_PANEL = f"{DOMAIN}.fake_device_1_panel_light"
+ENTITY_ID_HEALTH_MODE = f"{DOMAIN}.fake_device_1_health_mode"
 ENTITY_ID_QUIET = f"{DOMAIN}.fake_device_1_quiet"
 ENTITY_ID_FRESH_AIR = f"{DOMAIN}.fake_device_1_fresh_air"
 ENTITY_ID_XFAN = f"{DOMAIN}.fake_device_1_xfan"
@@ -34,6 +35,7 @@ async def async_setup_gree(hass):
     "entity",
     [
         ENTITY_ID_LIGHT_PANEL,
+        ENTITY_ID_HEALTH_MODE,
         ENTITY_ID_QUIET,
         ENTITY_ID_FRESH_AIR,
         ENTITY_ID_XFAN,
@@ -59,6 +61,7 @@ async def test_send_switch_on(hass, entity):
     "entity",
     [
         ENTITY_ID_LIGHT_PANEL,
+        ENTITY_ID_HEALTH_MODE,
         ENTITY_ID_QUIET,
         ENTITY_ID_FRESH_AIR,
         ENTITY_ID_XFAN,
@@ -86,6 +89,7 @@ async def test_send_switch_on_device_timeout(hass, device, entity):
     "entity",
     [
         ENTITY_ID_LIGHT_PANEL,
+        ENTITY_ID_HEALTH_MODE,
         ENTITY_ID_QUIET,
         ENTITY_ID_FRESH_AIR,
         ENTITY_ID_XFAN,
@@ -111,6 +115,7 @@ async def test_send_switch_off(hass, entity):
     "entity",
     [
         ENTITY_ID_LIGHT_PANEL,
+        ENTITY_ID_HEALTH_MODE,
         ENTITY_ID_QUIET,
         ENTITY_ID_FRESH_AIR,
         ENTITY_ID_XFAN,
@@ -161,6 +166,7 @@ async def test_send_switch_toggle(hass, entity):
     "entity,name",
     [
         (ENTITY_ID_LIGHT_PANEL, "Panel Light"),
+        (ENTITY_ID_HEALTH_MODE, "Health mode"),
         (ENTITY_ID_QUIET, "Quiet"),
         (ENTITY_ID_FRESH_AIR, "Fresh Air"),
         (ENTITY_ID_XFAN, "XFan"),
