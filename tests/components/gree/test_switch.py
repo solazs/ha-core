@@ -1,6 +1,7 @@
 """Tests for gree component."""
 from greeclimate.exceptions import DeviceTimeoutError
 import pytest
+from unittest.mock import patch
 
 from homeassistant.components.gree.const import DOMAIN as GREE_DOMAIN
 from homeassistant.components.switch import DOMAIN
@@ -13,7 +14,8 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.setup import async_setup_component
+
+from homeassistant.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
 
@@ -24,11 +26,31 @@ ENTITY_ID_FRESH_AIR = f"{DOMAIN}.fake_device_1_fresh_air"
 ENTITY_ID_XFAN = f"{DOMAIN}.fake_device_1_xfan"
 
 
-async def async_setup_gree(hass):
+async def async_setup_gree(hass, enable_health=True):
     """Set up the gree switch platform."""
-    MockConfigEntry(domain=GREE_DOMAIN).add_to_hass(hass)
-    await async_setup_component(hass, GREE_DOMAIN, {GREE_DOMAIN: {DOMAIN: {}}})
-    await hass.async_block_till_done()
+    entry = MockConfigEntry(domain=GREE_DOMAIN, data={GREE_DOMAIN: {DOMAIN: {}}})
+    entry.add_to_hass(hass)
+
+    if enable_health:
+        with patch(
+            "homeassistant.components.gree.switch.GreeHealthModeSwitchEntity.entity_registry_enabled_default",
+            True,
+        ):
+            await hass.config_entries.async_setup(entry.entry_id)
+            await hass.async_block_till_done()
+    else:
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+
+async def test_health_mode_disabled_by_default(hass):
+    """Test for making sure health mode is disabled on first load."""
+    await async_setup_gree(hass, False)
+
+    assert (
+        er.async_get(hass).async_get(ENTITY_ID_HEALTH_MODE).disabled_by
+        == er.RegistryEntryDisabler.INTEGRATION
+    )
 
 
 @pytest.mark.parametrize(

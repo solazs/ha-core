@@ -82,6 +82,7 @@ class GreeHealthModeSwitchEntity(GreeEntity, SwitchEntity):
     def __init__(self, coordinator):
         """Initialize the Gree device."""
         super().__init__(coordinator, "Health mode")
+        self._attr_entity_registry_enabled_default = False
 
     @property
     def icon(self) -> str | None:
