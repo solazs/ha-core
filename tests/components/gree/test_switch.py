@@ -1,7 +1,6 @@
 """Tests for gree component."""
 from greeclimate.exceptions import DeviceTimeoutError
 import pytest
-from unittest.mock import patch
 
 from homeassistant.components.gree.const import DOMAIN as GREE_DOMAIN
 from homeassistant.components.switch import DOMAIN
@@ -14,7 +13,6 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_ON,
 )
-
 from homeassistant.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry
@@ -26,26 +24,17 @@ ENTITY_ID_FRESH_AIR = f"{DOMAIN}.fake_device_1_fresh_air"
 ENTITY_ID_XFAN = f"{DOMAIN}.fake_device_1_xfan"
 
 
-async def async_setup_gree(hass, enable_health=True):
+async def async_setup_gree(hass):
     """Set up the gree switch platform."""
     entry = MockConfigEntry(domain=GREE_DOMAIN, data={GREE_DOMAIN: {DOMAIN: {}}})
     entry.add_to_hass(hass)
-
-    if enable_health:
-        with patch(
-            "homeassistant.components.gree.switch.GreeHealthModeSwitchEntity.entity_registry_enabled_default",
-            True,
-        ):
-            await hass.config_entries.async_setup(entry.entry_id)
-            await hass.async_block_till_done()
-    else:
-        await hass.config_entries.async_setup(entry.entry_id)
-        await hass.async_block_till_done()
+    await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
 
 
 async def test_health_mode_disabled_by_default(hass):
     """Test for making sure health mode is disabled on first load."""
-    await async_setup_gree(hass, False)
+    await async_setup_gree(hass)
 
     assert (
         er.async_get(hass).async_get(ENTITY_ID_HEALTH_MODE).disabled_by
@@ -63,7 +52,7 @@ async def test_health_mode_disabled_by_default(hass):
         ENTITY_ID_XFAN,
     ],
 )
-async def test_send_switch_on(hass, entity):
+async def test_send_switch_on(hass, entity, entity_registry_enabled_by_default):
     """Test for sending power on command to the device."""
     await async_setup_gree(hass)
 
@@ -89,7 +78,9 @@ async def test_send_switch_on(hass, entity):
         ENTITY_ID_XFAN,
     ],
 )
-async def test_send_switch_on_device_timeout(hass, device, entity):
+async def test_send_switch_on_device_timeout(
+    hass, device, entity, entity_registry_enabled_by_default
+):
     """Test for sending power on command to the device with a device timeout."""
     device().push_state_update.side_effect = DeviceTimeoutError
 
@@ -117,7 +108,7 @@ async def test_send_switch_on_device_timeout(hass, device, entity):
         ENTITY_ID_XFAN,
     ],
 )
-async def test_send_switch_off(hass, entity):
+async def test_send_switch_off(hass, entity, entity_registry_enabled_by_default):
     """Test for sending power on command to the device."""
     await async_setup_gree(hass)
 
@@ -143,7 +134,7 @@ async def test_send_switch_off(hass, entity):
         ENTITY_ID_XFAN,
     ],
 )
-async def test_send_switch_toggle(hass, entity):
+async def test_send_switch_toggle(hass, entity, entity_registry_enabled_by_default):
     """Test for sending power on command to the device."""
     await async_setup_gree(hass)
 
@@ -194,7 +185,7 @@ async def test_send_switch_toggle(hass, entity):
         (ENTITY_ID_XFAN, "XFan"),
     ],
 )
-async def test_entity_name(hass, entity, name):
+async def test_entity_name(hass, entity, name, entity_registry_enabled_by_default):
     """Test for name property."""
     await async_setup_gree(hass)
     state = hass.states.get(entity)
